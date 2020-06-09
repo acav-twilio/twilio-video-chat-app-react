@@ -5,6 +5,8 @@ import useParticipants from '../../hooks/useParticipants/useParticipants';
 import useVideoContext from '../../hooks/useVideoContext/useVideoContext';
 import useSelectedParticipant from '../VideoProvider/useSelectedParticipant/useSelectedParticipant';
 
+import Chat from '../Chat/Chat.js';
+
 const Container = styled('aside')(({ theme }) => ({
   padding: '0.5em',
   overflowY: 'auto',
@@ -45,6 +47,7 @@ export default function ParticipantStrip() {
             onClick={() => setSelectedParticipant(participant)}
           />
         ))}
+        <Chat />
       </ScrollContainer>
     </Container>
   );
