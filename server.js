@@ -15,9 +15,8 @@ const twilioAccountSid = process.env.TWILIO_ACCOUNT_SID;
 const twilioApiKeySID = process.env.TWILIO_API_KEY_SID;
 const twilioApiKeySecret = process.env.TWILIO_API_KEY_SECRET;
 
-const twilioApiKeySID2 = process.env.TWILIO_API_KEY_SID2;
-const twilioApiKeySecret2 = process.env.TWILIO_API_KEY_SECRET2;
 const twilioChatServiceID = process.env.TWILIO_CHAT_SERVICE_SID;
+
 
 app.use(express.static(path.join(__dirname, 'build')));
 
@@ -34,11 +33,11 @@ app.get('/token', (req, res) => {
 });
 
 app.get('/token-chat', function (req, res) {
-  const token = new AccessToken(twilioAccountSid, twilioApiKeySID2, twilioApiKeySecret2, {
+  const token = new AccessToken(twilioAccountSid, twilioApiKeySID, twilioApiKeySecret, {
     ttl: MAX_ALLOWED_SESSION_DURATION,
   });
 
-  token.identity = chance.name();
+  token.identity = chance.d10();
   token.addGrant(new ChatGrant({
     serviceSid: twilioChatServiceID
   }))

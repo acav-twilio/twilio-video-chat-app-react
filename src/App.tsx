@@ -33,7 +33,8 @@ export default function App() {
     <Container style={{ height }}>
       <MenuBar />
       <Main>
-        {roomState === 'disconnected' ? <LocalVideoPreview /> : <Room />}
+        {//roomState === 'disconnected' ? < LocalVideoPreview /> : <Room />
+        roomState === 'disconnected' ? <div /> : <Room />}
         <Controls />
       </Main>
       <ReconnectingNotification />
