@@ -55,11 +55,11 @@ const useStyles = makeStyles({
   },
 });
 
-const theme = createMuiTheme({
+const theme = {
   palette: {
     type: 'light',
   },
-});
+};
 
 export default function LoginPage() {
   const classes = useStyles();

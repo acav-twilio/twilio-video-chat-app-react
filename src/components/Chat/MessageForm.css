@@ -9,8 +9,8 @@
 }
 
 .MessageForm .button-container {
-  flex: 0 0 6em;
-  margin: 1px 1px 1px 0;
+  /* flex: 0 0 6em;
+  margin: 1px 1px 1px 0;*/
 }
 
 .MessageForm input,
@@ -22,7 +22,7 @@
   font-size: inherit;
   height: 100%;
   outline: none;
-  width: 100%;
+  /* width: 100%;*/
 }
 
 .MessageForm input {

@@ -27,17 +27,26 @@ app.get('/token', (req, res) => {
   });
   token.identity = identity;
   const videoGrant = new VideoGrant({ room: roomName });
+  /* token.addGrant(new ChatGrant({
+    serviceSid: twilioChatServiceID
+  })) // ACAV for chat it did not work*/
   token.addGrant(videoGrant);
-  res.send(token.toJwt());
   console.log(`issued token for ${identity} in room ${roomName} ${token}`);
+  console.log(`issued token for ${token.identity} in chat SID ${twilioChatServiceID} ${token}`);
+  res.send(token.toJwt());
+ 
+
 });
 
+//ACAV - the code below is not used when the token from the video is used to request access to chat too
 app.get('/token-chat', function (req, res) {
+  const { identity, roomName } = req.query;
+  console.log(`${identity} - ${roomName}`);
   const token = new AccessToken(twilioAccountSid, twilioApiKeySID, twilioApiKeySecret, {
     ttl: MAX_ALLOWED_SESSION_DURATION,
   });
-
-  token.identity = chance.d10();
+  
+  token.identity = identity;
   token.addGrant(new ChatGrant({
     serviceSid: twilioChatServiceID
   }))
@@ -48,6 +57,9 @@ app.get('/token-chat', function (req, res) {
   })
   
 })
+///////
+
+
 app.get('*', (_, res) => res.sendFile(path.join(__dirname, 'build/index.html')));
 
 app.listen(8081, () => console.log('token server running on 8081'));

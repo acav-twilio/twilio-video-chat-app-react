@@ -34,6 +34,7 @@ export interface IVideoContext {
   getLocalVideoTrack: (newOptions?: CreateLocalTrackOptions) => Promise<LocalVideoTrack>;
   getLocalAudioTrack: (deviceId?: string) => Promise<LocalAudioTrack>;
   isAcquiringLocalTracks: boolean;
+  token: string; //ACAV  - for chat
 }
 
 export const VideoContext = createContext<IVideoContext>(null!);
@@ -52,7 +53,7 @@ export function VideoProvider({ options, children, onError = () => {}, onDisconn
   };
 
   const { localTracks, getLocalVideoTrack, getLocalAudioTrack, isAcquiringLocalTracks } = useLocalTracks();
-  const { room, isConnecting, connect } = useRoom(localTracks, onErrorCallback, options);
+  const { room, isConnecting, connect, token } = useRoom(localTracks, onErrorCallback, options); //ACAV - for chat
 
   // Register onError and onDisconnect callback functions.
   useHandleRoomDisconnectionErrors(room, onError);
@@ -71,6 +72,7 @@ export function VideoProvider({ options, children, onError = () => {}, onDisconn
         getLocalAudioTrack,
         connect,
         isAcquiringLocalTracks,
+        token,
       }}
     >
       <SelectedParticipantProvider room={room}>{children}</SelectedParticipantProvider>

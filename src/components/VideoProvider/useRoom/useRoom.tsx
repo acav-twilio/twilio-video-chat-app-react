@@ -11,6 +11,7 @@ export default function useRoom(localTracks: LocalTrack[], onError: Callback, op
   const [room, setRoom] = useState<Room>(new EventEmitter() as Room);
   const [isConnecting, setIsConnecting] = useState(false);
   const localTracksRef = useRef<LocalTrack[]>([]);
+  const [token, setToken] = useState(''); //ACAV - token added for chat
 
   useEffect(() => {
     // It can take a moment for Video.connect to connect to a room. During this time, the user may have enabled or disabled their
@@ -20,9 +21,10 @@ export default function useRoom(localTracks: LocalTrack[], onError: Callback, op
   }, [localTracks]);
 
   const connect = useCallback(
-    token => {
+    _token => {
+      //setToken(_token);  //ACAV passing a common toke for both video and chat is not working at the moment
       setIsConnecting(true);
-      return Video.connect(token, { ...options, tracks: [] }).then(
+      return Video.connect(_token, { ...options, tracks: [] }).then(
         newRoom => {
           setRoom(newRoom);
           const disconnect = () => newRoom.disconnect();
@@ -68,5 +70,5 @@ export default function useRoom(localTracks: LocalTrack[], onError: Callback, op
     [options, onError]
   );
 
-  return { room, isConnecting, connect };
+  return { room, isConnecting, connect, token }; //ACAV - token added for chat
 }

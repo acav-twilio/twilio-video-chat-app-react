@@ -5,31 +5,68 @@ import TwilioChat from 'twilio-chat';
 import $ from 'jquery';
 import './Chat.css';
 
+import { styled } from '@material-ui/core/styles';
+
+const Container = styled('aside')(({ theme }) => ({
+  position: 'relative',
+  height: '100%',
+  display: 'grid',
+  gridTemplateRows: '1fr 25px',
+  padding: '0.5em',
+  overflowY: 'auto',
+  backgroundColor: '#FFFFFF11',
+  [theme.breakpoints.down('xs')]: {
+    overflowY: 'initial',
+    overflowX: 'auto',
+    padding: 0,
+    display: 'flex',
+  },
+}));
+
 class Chat extends Component {
   constructor(props) {
     super(props);
     this.state = {
       messages: [],
-      username: null,
+      username: props.identity,
+      room: props.room,
       channel: null,
+      token: props.token,
     };
   }
 
+  setChatCredentials = (r, id) => {
+    //ACAV not used
+    this.setState({ username: id });
+    this.setState({ room: r });
+  };
+
   componentDidMount = () => {
-    this.getToken()
-      .then(this.createChatClient)
-      .then(this.joinGeneralChannel)
-      .then(this.configureChannelEvents)
-      .catch(error => {
-        this.addMessage({ body: `Error: ${error.message}` });
-      });
+    console.log(this.state.room); //ACAV creation of chat instance + join channel based on token
+    if (this.state.token === '') {
+      this.getToken()
+        .then(this.createChatClient)
+        .then(this.joinGeneralChannel)
+        .then(this.configureChannelEvents)
+        .catch(error => {
+          this.addMessage({ body: `Error: ${error.message}` });
+        });
+    } else {
+      console.log(this.state.token);
+      this.createChatClient(this.state.token)
+        .then(this.joinGeneralChannel)
+        .then(this.configureChannelEvents)
+        .catch(error => {
+          this.addMessage({ body: `Error: ${error.message}` });
+        });
+    }
   };
 
   getToken = () => {
     return new Promise((resolve, reject) => {
       //this.addMessage({ body: 'Connecting...' });
 
-      $.getJSON('/token-chat', token => {
+      $.getJSON(`/token-chat?identity=${this.state.username}&roomName=${this.state.room}`, token => {
         this.setState({ username: token.identity });
         resolve(token);
       }).fail(() => {
@@ -49,7 +86,7 @@ class Chat extends Component {
         .getSubscribedChannels()
         .then(() => {
           chatClient
-            .getChannelByUniqueName('general')
+            .getChannelByUniqueName(this.state.room)
             .then(channel => {
               //this.addMessage({ body: 'Joining  channel...' });
               this.setState({ channel });
@@ -60,7 +97,7 @@ class Chat extends Component {
                   //this.addMessage({ body: `Joined general channel as ${this.state.username}` });
                   window.addEventListener('beforeunload', () => channel.leave());
                 })
-                .catch(() => reject(Error('Could not join general channel.')));
+                .catch(() => reject(Error('Could not join  channel.')));
 
               resolve(channel);
             })
@@ -74,7 +111,7 @@ class Chat extends Component {
     return new Promise((resolve, reject) => {
       //this.addMessage({ body: 'Creating general channel...' });
       chatClient
-        .createChannel({ uniqueName: 'general', friendlyName: 'General Chat' })
+        .createChannel({ uniqueName: this.state.room, friendlyName: `${this.state.room} Chat` })
         .then(() => this.joinGeneralChannel(chatClient))
         .catch(() => reject(Error('Could not create general channel.')));
     });
@@ -109,10 +146,10 @@ class Chat extends Component {
 
   render() {
     return (
-      <div className="Chat">
+      <Container>
         <MessageList messages={this.state.messages} />
         <MessageForm onMessageSend={this.handleNewMessage} />
-      </div>
+      </Container>
     );
   }
 }

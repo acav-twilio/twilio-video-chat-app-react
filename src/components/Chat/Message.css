@@ -8,10 +8,10 @@
 
 .Message .author {
   font-weight: bold;
-  color: #888;
+  color: #f88;
   margin: 0 5px 0 0;
 }
 
 .Message.me .author {
-  color: #b6191e;
+  color: #b6ffff;
 }

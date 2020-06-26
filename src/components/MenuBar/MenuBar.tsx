@@ -89,7 +89,7 @@ export default function MenuBar() {
     if (!window.location.origin.includes('twil.io')) {
       window.history.replaceState(null, '', window.encodeURI(`/room/${roomName}${window.location.search || ''}`));
     }
-    getToken(name, roomName).then(token => connect(token));
+    getToken(name, roomName).then(token => connect(token)); //ACAV - point at which video connects and token for chat is also returned
   };
 
   return (
