@@ -88,18 +88,16 @@ class Chat extends Component {
           chatClient
             .getChannelByUniqueName(this.state.room)
             .then(channel => {
-              //this.addMessage({ body: 'Joining  channel...' });
+              this.addMessage({ body: 'Joining  channel...' });
               this.setState({ channel });
-
               channel
                 .join()
                 .then(() => {
-                  //this.addMessage({ body: `Joined general channel as ${this.state.username}` });
+                  this.addMessage({ body: `Joined  channel as ${this.state.username}` });
                   window.addEventListener('beforeunload', () => channel.leave());
+                  resolve(channel);
                 })
                 .catch(() => reject(Error('Could not join  channel.')));
-
-              resolve(channel);
             })
             .catch(() => this.createGeneralChannel(chatClient));
         })
@@ -109,10 +107,16 @@ class Chat extends Component {
 
   createGeneralChannel = chatClient => {
     return new Promise((resolve, reject) => {
-      //this.addMessage({ body: 'Creating general channel...' });
+      this.addMessage({ body: 'Creating general channel...' });
       chatClient
         .createChannel({ uniqueName: this.state.room, friendlyName: `${this.state.room} Chat` })
-        .then(() => this.joinGeneralChannel(chatClient))
+        .then(() => {
+          this.joinGeneralChannel(chatClient)
+            .then(this.configureChannelEvents)
+            .catch(error => {
+              this.addMessage({ body: `Error: ${error.message}` });
+            });
+        })
         .catch(() => reject(Error('Could not create general channel.')));
     });
   };
@@ -131,16 +135,18 @@ class Chat extends Component {
   };
 
   configureChannelEvents = channel => {
+    this.addMessage({ body: 'Configuring channel...' });
+
     channel.on('messageAdded', ({ author, body }) => {
       this.addMessage({ author, body });
     });
 
     channel.on('memberJoined', member => {
-      //this.addMessage({ body: `${member.identity} has joined the channel.` });
+      this.addMessage({ body: `${member.identity} has joined the channel.` });
     });
 
     channel.on('memberLeft', member => {
-      //this.addMessage({ body: `${member.identity} has left the channel.` });
+      this.addMessage({ body: `${member.identity} has left the channel.` });
     });
   };
 
