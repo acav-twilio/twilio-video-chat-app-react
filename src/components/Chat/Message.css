@@ -3,15 +3,20 @@
 }
 
 .Message.log {
-  color: #bbb;
+  color: #777;
 }
 
 .Message .author {
   font-weight: bold;
-  color: #f88;
+  color: #6cc;
   margin: 0 5px 0 0;
 }
 
 .Message.me .author {
-  color: #b6ffff;
+  color: #b6b6ff;
+}
+
+.Message .anchor {
+  text-decoration: none;
+  color: #bbb;
 }

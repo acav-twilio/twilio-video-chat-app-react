@@ -1,4 +1,5 @@
 .MessageList {
   overflow-y: auto;
   padding: 4px;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }

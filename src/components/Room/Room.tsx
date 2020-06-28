@@ -27,6 +27,7 @@ export default function Room() {
   const identity = room.localParticipant.identity;
   console.log(room.name);
   console.log(room.localParticipant.identity);
+  console.log(token); //acav check
   return (
     <>
       <Container>

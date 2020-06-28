@@ -1,7 +1,6 @@
 import React, { Component, Button } from 'react';
 import PropTypes from 'prop-types';
 import './MessageForm.css';
-import FileDialogue from './FileDialogue';
 import { styled } from '@material-ui/core/styles';
 import SendIcon from '@material-ui/icons/Send';
 import IconButton from '@material-ui/core/IconButton';
@@ -10,7 +9,7 @@ const Container = styled('form')(({ theme }) => ({
   position: 'relative',
   height: '100%',
   display: 'flex',
-  gridTemplateColumns: '25px 1fr 1fr',
+  gridTemplateColumns: '25px 1fr',
   //padding: '0.5em',
   overflowY: 'auto',
   backgroundColor: '#FFFFFF',
@@ -48,7 +47,6 @@ class MessageForm extends Component {
             <SendIcon fontSize="small" color="primary" />
           </IconButton>
         </div>
-        <FileDialogue />
       </Container>
     );
   }

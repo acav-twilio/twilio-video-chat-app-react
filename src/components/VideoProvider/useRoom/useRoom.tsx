@@ -22,7 +22,8 @@ export default function useRoom(localTracks: LocalTrack[], onError: Callback, op
 
   const connect = useCallback(
     _token => {
-      //setToken(_token);  //ACAV passing a common toke for both video and chat is not working at the moment
+      setToken(_token); //ACAV passing a common toke for both video and chat is not working at the moment
+      console.log(`inside connect ${_token}`);
       setIsConnecting(true);
       return Video.connect(_token, { ...options, tracks: [] }).then(
         newRoom => {

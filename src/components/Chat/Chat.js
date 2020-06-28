@@ -5,6 +5,8 @@ import TwilioChat from 'twilio-chat';
 import $ from 'jquery';
 import './Chat.css';
 
+import FileDialogue from './FileDialogue';
+
 import { styled } from '@material-ui/core/styles';
 
 const Container = styled('aside')(({ theme }) => ({
@@ -42,7 +44,7 @@ class Chat extends Component {
   };
 
   componentDidMount = () => {
-    console.log(this.state.room); //ACAV creation of chat instance + join channel based on token
+    console.log(`componentdiddmount ${this.state.room}`); //ACAV creation of chat instance + join channel based on token
     if (this.state.token === '') {
       this.getToken()
         .then(this.createChatClient)
@@ -52,17 +54,19 @@ class Chat extends Component {
           this.addMessage({ body: `Error: ${error.message}` });
         });
     } else {
-      console.log(this.state.token);
+      console.log(`inside create chat client ${this.state.token}`);
       this.createChatClient(this.state.token)
         .then(this.joinGeneralChannel)
         .then(this.configureChannelEvents)
         .catch(error => {
+          console.log(`Error: ${error.message}`);
           this.addMessage({ body: `Error: ${error.message}` });
         });
     }
   };
 
   getToken = () => {
+    //ACAV not used in this version as one token used with both video and chat
     return new Promise((resolve, reject) => {
       //this.addMessage({ body: 'Connecting...' });
 
@@ -77,7 +81,8 @@ class Chat extends Component {
 
   createChatClient = token => {
     return new Promise((resolve, reject) => {
-      resolve(TwilioChat.create(token.jwt));
+      //resolve(TwilioChat.create(token.jwt)); //ACAV string returned directly - no JWT object!
+      resolve(TwilioChat.create(token));
     });
   };
   joinGeneralChannel = chatClient => {
@@ -88,16 +93,19 @@ class Chat extends Component {
           chatClient
             .getChannelByUniqueName(this.state.room)
             .then(channel => {
-              this.addMessage({ body: 'Joining  channel...' });
+              //this.addMessage({ body: 'Joining  channel...' });
               this.setState({ channel });
               channel
                 .join()
                 .then(() => {
-                  this.addMessage({ body: `Joined  channel as ${this.state.username}` });
+                  this.addMessage({ body: ` ${this.state.username} joined the session` });
                   window.addEventListener('beforeunload', () => channel.leave());
                   resolve(channel);
                 })
-                .catch(() => reject(Error('Could not join  channel.')));
+                .catch(error => {
+                  this.addMessage({ body: `Error: ${error.message}` });
+                  reject(Error('Could not join  channel.'));
+                });
             })
             .catch(() => this.createGeneralChannel(chatClient));
         })
@@ -107,7 +115,7 @@ class Chat extends Component {
 
   createGeneralChannel = chatClient => {
     return new Promise((resolve, reject) => {
-      this.addMessage({ body: 'Creating general channel...' });
+      //this.addMessage({ body: 'Creating general channel...' });
       chatClient
         .createChannel({ uniqueName: this.state.room, friendlyName: `${this.state.room} Chat` })
         .then(() => {
@@ -122,31 +130,75 @@ class Chat extends Component {
   };
 
   addMessage = message => {
-    const messageData = { ...message, me: message.author === this.state.username };
-    this.setState({
-      messages: [...this.state.messages, messageData],
-    });
+    console.log(`inside addMessage: ${message.type}`);
+
+    if (message.type === 'media') {
+      message.media
+        .getContentUrl()
+        .then(Url => {
+          console.log(`ur: ${Url}`);
+
+          const messageData = { ...message, me: message.author === this.state.username, mediaUrl: Url };
+          this.setState({
+            messages: [...this.state.messages, messageData],
+          });
+        })
+        .catch(e => {
+          console.log(`ERROR: ${e}`);
+        });
+    } else {
+      console.log(`inside else in addmessage ${message.filename}`);
+      const messageData = { ...message, me: message.author === this.state.username };
+      this.setState({
+        messages: [...this.state.messages, messageData],
+      });
+    }
   };
 
   handleNewMessage = text => {
+    console.log(`handle new message ${text}`);
     if (this.state.channel) {
       this.state.channel.sendMessage(text);
     }
   };
 
-  configureChannelEvents = channel => {
-    this.addMessage({ body: 'Configuring channel...' });
+  handleNewMedia = formData => {
+    //ACAV to handle sending files in formData - different call strictly not needed - makes code more readable
+    console.log(formData);
+    if (this.state.channel) {
+      this.state.channel.sendMessage(formData);
+    }
+  };
 
-    channel.on('messageAdded', ({ author, body }) => {
-      this.addMessage({ author, body });
+  configureChannelEvents = channel => {
+    //this.addMessage({ body: 'Configuring channel...' });
+
+    channel.getMessages().then(messages => {
+      const totalMessages = messages.items.length;
+      for (let i = 0; i < totalMessages; i++) {
+        const message = messages.items[i];
+        console.log('Author:' + message.author);
+        if (message.media != null) console.log('Media: ' + message.media.filename);
+        this.addMessage({ author: message.author, body: message.body, type: message.type, media: message.media });
+      }
+      console.log('Total Messages:' + totalMessages);
+    });
+
+    /*  channel.on('messageAdded', ({ author, body }) => {
+      this.addMessage({ author, body });  //ACAV  -> need to check whether it is what we are expecting
+    }); */
+
+    channel.on('messageAdded', message => {
+      console.log(`messageAdded: ${message.body}`);
+      this.addMessage({ author: message.author, body: message.body, type: message.type, media: message.media });
     });
 
     channel.on('memberJoined', member => {
-      this.addMessage({ body: `${member.identity} has joined the channel.` });
+      this.addMessage({ body: `${member.identity} has joined the session.` });
     });
 
     channel.on('memberLeft', member => {
-      this.addMessage({ body: `${member.identity} has left the channel.` });
+      this.addMessage({ body: `${member.identity} has left the session.` });
     });
   };
 
@@ -155,6 +207,7 @@ class Chat extends Component {
       <Container>
         <MessageList messages={this.state.messages} />
         <MessageForm onMessageSend={this.handleNewMessage} />
+        <FileDialogue onMessageSend={this.handleNewMedia} />
       </Container>
     );
   }

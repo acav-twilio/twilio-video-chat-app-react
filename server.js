@@ -27,9 +27,9 @@ app.get('/token', (req, res) => {
   });
   token.identity = identity;
   const videoGrant = new VideoGrant({ room: roomName });
-  /* token.addGrant(new ChatGrant({
+  token.addGrant(new ChatGrant({
     serviceSid: twilioChatServiceID
-  })) // ACAV for chat it did not work*/
+  })) 
   token.addGrant(videoGrant);
   console.log(`issued token for ${identity} in room ${roomName} ${token}`);
   console.log(`issued token for ${token.identity} in chat SID ${twilioChatServiceID} ${token}`);

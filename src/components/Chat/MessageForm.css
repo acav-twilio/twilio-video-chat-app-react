@@ -22,9 +22,12 @@
   font-size: inherit;
   height: 100%;
   outline: none;
-  /* width: 100%;*/
+  width: 100%;
 }
 
 .MessageForm input {
   padding: 0 0 0 4px;
+}
+.MessageForm button {
+  padding: 0;
 }
