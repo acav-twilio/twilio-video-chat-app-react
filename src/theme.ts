@@ -20,7 +20,7 @@ export default createMuiTheme({
       main: '#BF2F46',
     },
     background: {
-      default: '#303930',
+      default: '#6B3E27',
       paper: '#423232',
     },
   },
