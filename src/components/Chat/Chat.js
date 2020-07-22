@@ -31,9 +31,9 @@ class Chat extends Component {
     this.state = {
       messages: [],
       username: props.identity,
-      room: props.room,
+      room: props.room, //this chat belongs to a video room
       channel: null,
-      token: props.token,
+      token: props.token, //this chat was created after having been granted access to a video room and I am using the same tokem
     };
   }
 
@@ -63,6 +63,11 @@ class Chat extends Component {
           this.addMessage({ body: `Error: ${error.message}` });
         });
     }
+  };
+
+  componentWillUnmount = () => {
+    this.state.channel.leave(); //when the object is destroyed it means that the video call has finished or stopped --> leave the channel
+    console.log('leaving the chat');
   };
 
   getToken = () => {
