@@ -106,12 +106,14 @@ This application requires an access token to connect to a Room. The included loc
 - Create an account in the [Twilio Console](https://www.twilio.com/console).
 - Click on 'Settings' and take note of your Account SID.
 - Create a new API Key in the [API Keys Section](https://www.twilio.com/console/video/project/api-keys) under Programmable Video Tools in the Twilio Console. Take note of the SID and Secret of the new API key.
-- Store your Account SID, API Key SID, and API Key Secret in a new file called `.env` in the root level of the application (example below).
+- Create a Chat Service and save the SID
+- Store your Account SID, API Key SID, API Key Secret and Chat Service SID in a new file called `.env` in the root level of the application (example below).
 
 ```
 TWILIO_ACCOUNT_SID=ACxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 TWILIO_API_KEY_SID=SKxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 TWILIO_API_KEY_SECRET=xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+TWILIO_CHAT_SERVICE_SID=ISxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 ```
 
 Now the local token server (see [server.js](server.js)) can dispense Access Tokens to connect to a Room.
@@ -232,3 +234,15 @@ See [.env.example](.env.example) for an explanation of the environment variables
 ## License
 
 See the [LICENSE](LICENSE) file for details.
+
+## Building on macOS Catalina
+
+In case the error below is generated after upgrading macOS Catalina to version 10.15.2
+“gyp: No Xcode or CLT version detected!” 
+
+Fix: Reinstall command line tools
+
+    $ xcode-select --print-path
+    $ sudo rm -r -f /Library/Developer/CommandLineTools (this path should be what is returned from the previous command)
+    $ xcode-select --install
+    
